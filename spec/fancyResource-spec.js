@@ -354,13 +354,35 @@ describe("fancyResource", function() {
     expect(person.name).toEqual('misko');
   });
 
-  describe('validations', function() {
+  describe('server-side validations', function() {
     // optionally expose a validation endpoint (opt-in)
-    // optionally expose a validation endpoint (opt-in)
+    // when receiving a 400 error 
+    beforeEach(function() {
+      CreditCard = $fancyResource('/CreditCard/:id', {id:'@id.key'}, {}, true);
+    });
+
+    it('should provide a validation action on the resource', function() {
+      expect(typeof CreditCard.validate).toBe('function');
+    });
+
+    it('should execute server side validation', function() {
+      $httpBackend.expect('POST', '/CreditCard!validate').respond({});
+      var cc = new CreditCard();
+      cc.$validate();
+    });
+
+    it('should copy the errors property from the response into the resource on 400 error', function() {
+      $httpBackend.expect('POST', '/CreditCard!validate').respond(400, '\n{\n"errors":\n{\n"foo":\n[\n"error in field foo"\n]\n}\n}\n');
+      var cc = new CreditCard();
+      cc.$validate();
+      $httpBackend.flush();
+      expect(cc.errors.foo).toEqual([ 'error in field foo' ]);
+    });
   });
 
   describe('nested resources', function() {
-
+    // declare that the resource contains nested resources.
+    // convert the nested resources to fancyResources in turn.
   });
 
   describe('failure mode', function() {
