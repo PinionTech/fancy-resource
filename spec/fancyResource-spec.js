@@ -1,13 +1,13 @@
 'use strict';
 
-describe("resource", function() {
-  var $resource, CreditCard, callback, $httpBackend;
+describe("fancyResource", function() {
+  var $fancyResource, CreditCard, callback, $httpBackend;
 
   beforeEach(module('fancyResource'));
   beforeEach(inject(function($injector) {
     $httpBackend = $injector.get('$httpBackend');
-    $resource = $injector.get('$resource');
-    CreditCard = $resource('/CreditCard/:id:verb', {id:'@id.key'}, {
+    $fancyResource = $injector.get('$fancyResource');
+    CreditCard = $fancyResource('/CreditCard/:id:verb', {id:'@id.key'}, {
       charge:{
         method:'POST',
         params:{verb:'!charge'}
@@ -44,12 +44,12 @@ describe("resource", function() {
 
   it('should default to empty parameters', function() {
     $httpBackend.expect('GET', 'URL').respond({});
-    $resource('URL').query();
+    $fancyResource('URL').query();
   });
 
 
   it('should ignore slashes of undefinend parameters', function() {
-    var R = $resource('/Path/:a/:b/:c');
+    var R = $fancyResource('/Path/:a/:b/:c');
 
     $httpBackend.when('GET', '/Path').respond('{}');
     $httpBackend.when('GET', '/Path/0').respond('{}');
@@ -75,7 +75,7 @@ describe("resource", function() {
 
 
   it('should support escaping colons in url template', function() {
-    var R = $resource('http://localhost\\:8080/Path/:a/\\:stillPath/:b');
+    var R = $fancyResource('http://localhost\\:8080/Path/:a/\\:stillPath/:b');
 
     $httpBackend.expect('GET', 'http://localhost:8080/Path/foo/:stillPath/bar').respond();
     R.get({a: 'foo', b: 'bar'});
@@ -83,7 +83,7 @@ describe("resource", function() {
 
 
   it('should correctly encode url params', function() {
-    var R = $resource('/Path/:a');
+    var R = $fancyResource('/Path/:a');
 
     $httpBackend.expect('GET', '/Path/foo%231').respond('{}');
     $httpBackend.expect('GET', '/Path/doh!@foo?bar=baz%231').respond('{}');
@@ -99,14 +99,14 @@ describe("resource", function() {
     //so we need this test to make sure that we don't over-encode the params and break stuff like
     //buzz api which uses @self
 
-    var R = $resource('/Path/:a');
+    var R = $fancyResource('/Path/:a');
     $httpBackend.expect('GET', '/Path/doh@fo%20o?!do%26h=g%3Da+h&:bar=$baz@1').respond('{}');
     R.get({a: 'doh@fo o', ':bar': '$baz@1', '!do&h': 'g=a h'});
   });
 
 
   it('should encode & in url params', function() {
-    var R = $resource('/Path/:a');
+    var R = $fancyResource('/Path/:a');
     $httpBackend.expect('GET', '/Path/doh&foo?bar=baz%261').respond('{}');
     R.get({a: 'doh&foo', bar: 'baz&1'});
   });
@@ -114,7 +114,7 @@ describe("resource", function() {
 
   it('should build resource with default param', function() {
     $httpBackend.expect('GET', '/Order/123/Line/456.visa?minimum=0.05').respond({id: 'abc'});
-    var LineItem = $resource('/Order/:orderId/Line/:id:verb',
+    var LineItem = $fancyResource('/Order/:orderId/Line/:id:verb',
                                   {orderId: '123', id: '@id.key', verb:'.visa', minimum: 0.05});
     var item = LineItem.get({id: 456});
     $httpBackend.flush();
@@ -124,7 +124,7 @@ describe("resource", function() {
 
   it("should build resource with action default param overriding default param", function() {
     $httpBackend.expect('GET', '/Customer/123').respond({id: 'abc'});
-    var TypeItem = $resource('/:type/:typeId', {type: 'Order'},
+    var TypeItem = $fancyResource('/:type/:typeId', {type: 'Order'},
                                   {get: {method: 'GET', params: {type: 'Customer'}}});
     var item = TypeItem.get({typeId: 123});
 
@@ -135,7 +135,7 @@ describe("resource", function() {
 
   it('should build resource with action default param reading the value from instance', function() {
     $httpBackend.expect('POST', '/Customer/123').respond();
-    var R = $resource('/Customer/:id', {}, {post: {method: 'POST', params: {id: '@id'}}});
+    var R = $fancyResource('/Customer/:id', {}, {post: {method: 'POST', params: {id: '@id'}}});
 
     var inst = new R({id:123});
     expect(inst.id).toBe(123);
@@ -145,7 +145,7 @@ describe("resource", function() {
 
 
   it('should handle multiple params with same name', function() {
-    var R = $resource('/:id/:id');
+    var R = $fancyResource('/:id/:id');
 
     $httpBackend.when('GET').respond('{}');
     $httpBackend.expect('GET', '/1/1');
@@ -346,7 +346,7 @@ describe("resource", function() {
 
 
   it('should exercise full stack', function() {
-    var Person = $resource('/Person/:id');
+    var Person = $fancyResource('/Person/:id');
 
     $httpBackend.expect('GET', '/Person/123').respond('\n{\n"name":\n"misko"\n}\n');
     var person = Person.get({id:123});
@@ -354,6 +354,14 @@ describe("resource", function() {
     expect(person.name).toEqual('misko');
   });
 
+  describe('validations', function() {
+    // optionally expose a validation endpoint (opt-in)
+    // optionally expose a validation endpoint (opt-in)
+  });
+
+  describe('nested resources', function() {
+
+  });
 
   describe('failure mode', function() {
     var ERROR_CODE = 500,
