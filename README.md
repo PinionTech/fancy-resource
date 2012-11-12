@@ -1,4 +1,3 @@
-
 # FancyResource
 
 FancyResource is an experiment to add support for server-side validations and
