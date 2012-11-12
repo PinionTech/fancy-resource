@@ -3,6 +3,8 @@ node_js:
   - 0.8
 
 before_install:
+  - npm install qq
+  - npm install q-fs
   - git submodule update --init --recursive
   - (cd deps/angular.js && rake package)
 
