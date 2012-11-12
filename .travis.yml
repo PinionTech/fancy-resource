@@ -4,6 +4,7 @@ node_js:
 
 before_install:
   - git submodule update --init --recursive
+  - (cd deps/angular.js && rake package)
 
 before_script:
   - export DISPLAY=:99.0
