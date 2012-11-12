@@ -71,13 +71,12 @@ not my main language and I suspect there may be some dumb code in here.
 
 ## Future directions
 
-This project resulted from an itch I needed to scratch. I'd rather not maintain
-a fork of ngResource, but have this functionality merged into angular.js itself.
-Obviously that depends on the angular.js team and if they think this is
-something that the larger community would be interested in.
-
-I'd also like to make angular.js's existing support for validations work with
-server-side validation.
+- Provide a live server side validations feature for as-you-type validations
+  (throttled).
+- NgModelController tracks pristine, dirty and valid/invalid states. Perhaps
+  the server & client-side validations can be married somehow.
+- Would be great to get this functionality into a state where it can be merged
+  into ngResource or into Angular as an alternative to ngResource :)
 
 ## Running the tests
 
