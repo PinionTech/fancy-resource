@@ -355,8 +355,6 @@ describe("fancyResource", function() {
   });
 
   describe('server-side validations', function() {
-    // optionally expose a validation endpoint (opt-in)
-    // when receiving a 400 error 
     beforeEach(function() {
       CreditCard = $fancyResource('/CreditCard/:id', {id:'@id.key'}, {}, true);
     });
@@ -371,18 +369,73 @@ describe("fancyResource", function() {
       cc.$validate();
     });
 
-    it('should copy the errors property from the response into the resource on 400 error', function() {
-      $httpBackend.expect('POST', '/CreditCard!validate').respond(400, '\n{\n"errors":\n{\n"foo":\n[\n"error in field foo"\n]\n}\n}\n');
-      var cc = new CreditCard();
-      cc.$validate();
-      $httpBackend.flush();
-      expect(cc.errors.foo).toEqual([ 'error in field foo' ]);
+    describe('copying the errors from the response', function() {
+
+      it('should happen for 200', function() {
+        $httpBackend.expect('POST', '/CreditCard!validate').respond(200, '\n{\n"errors":\n{\n"foo":\n[\n"error in field foo"\n]\n}\n}\n');
+        var cc = new CreditCard();
+        cc.$validate();
+        $httpBackend.flush();
+        expect(cc.errors.foo).toEqual([ 'error in field foo' ]);
+      });
+
+      it('should happen for 201', function() {
+        $httpBackend.expect('POST', '/CreditCard!validate').respond(201, '\n{\n"errors":\n{\n"foo":\n[\n"error in field foo"\n]\n}\n}\n');
+        var cc = new CreditCard();
+        cc.$validate();
+        $httpBackend.flush();
+        expect(cc.errors.foo).toEqual([ 'error in field foo' ]);
+      });
+
+      it('should *only* copy the errors property', function() {
+        $httpBackend.expect('POST', '/CreditCard!validate').respond(201, '\n{\n"foo":\n"bar",\n"errors":\n{\n"foo":\n[\n"error in field foo"\n]\n}\n}\n');
+        var cc = new CreditCard();
+        cc.$validate();
+        $httpBackend.flush();
+        expect(cc.foo).toBeUndefined();
+      });
+
     });
+
   });
 
   describe('nested resources', function() {
-    // declare that the resource contains nested resources.
-    // convert the nested resources to fancyResources in turn.
+    describe('has one', function() {
+      var SteeringWheel = null, Car = null;
+
+      beforeEach(function() {
+        SteeringWheel = $fancyResource('/SteeringWheel/:id', {id:'@id.key'}, {}, true);
+        Car = $fancyResource('/Cars/:id', {id:'@id.key'}, {}, true, {
+          steeringWheel : SteeringWheel 
+        });
+      });
+
+      it('should convert nested resources to the appropriate type', function() {
+        $httpBackend.expect('GET', '/Cars/1').respond(200, '{ "id": 1, "steeringWheel": { "id": 10 } }');
+        var car = Car.get({id: 1});
+        $httpBackend.flush();
+        expect(car.steeringWheel instanceof SteeringWheel).toEqual(true);
+      });
+    });
+
+    describe('has many', function() {
+      var Employee = null, Manager = null;
+
+      beforeEach(function() {
+        Employee = $fancyResource('/Employees/:id', {id:'@id.key'}, {}, true);
+        Manager = $fancyResource('/Managers/:id', {id:'@id.key'}, {}, true, {
+          employees: [ Employee ]
+        });
+      });
+
+      it('should convert nested resources to the appropriate type', function() {
+        $httpBackend.expect('GET', '/Managers/1').respond(200, '{ "id": 1, "employees":[ { "id": 10 }, {"id": 11} ]}');
+        var manager = Manager.get({id: 1});
+        $httpBackend.flush();
+        expect(manager.employees.length).toEqual(2);
+        expect(manager.employees[0] instanceof Employee).toEqual(true);
+      });
+    });
   });
 
   describe('failure mode', function() {
