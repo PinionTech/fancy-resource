@@ -1,5 +1,7 @@
 # FancyResource
 
+![Build Status](https://travis-ci.org/PinionTech/fancy-resource.png "Build Status")
+
 FancyResource is an experiment to add support for server-side validations and
 proper nested resources (of their own 'class') to ngResource.
 
