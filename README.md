@@ -52,6 +52,25 @@ This request should *never* return a 400 error. A 400 should be reserved for
 requests that actually have side effects such as a save or an update of
 a resource.
 
+Resources can be validating by calling the `$validate()` method.
+
+### Validating a single property
+
+FancyResource supports validating a single property at a time. This is great
+when you want a live validation in a form for example. To validate a single
+field, call `validateProperty('propertyName')` on the resource instance.
+
+The only *new* errors added to the resource will be errors associated with that
+property. However, it will always take the opportunity to clear as many errors
+as possible so errors associated with other fields will be cleared if possible.
+
+### Throttled validations
+
+`validateProperty(property)` is designed for live-validation of forms.  This
+could be expensive if triggered on every keystroke, so instead the backend API
+call to the $http service is throttled to call no more than once every two
+seconds.
+
 ### Creating and updating resources
 
 When a regular PUT or POST is executed to update or create your resources,
