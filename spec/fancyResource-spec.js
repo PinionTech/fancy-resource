@@ -416,6 +416,17 @@ describe("fancyResource", function() {
         $httpBackend.flush();
         expect(cc.errors.bar).toBeUndefined();
       });
+
+      it('should throttle http requests to the server', function() {
+        // This spec will fail if there is > 1 call to the server
+        $httpBackend.expect('POST', '/CreditCard!validate').respond(200, '{"errors":{"foo":["error in field foo"],"bar":["error in field bar"]}}');
+        var cc = new CreditCard();
+        cc.validateProperty('foo');
+        cc.validateProperty('bar');
+        $httpBackend.flush();
+        expect(cc.errors.foo).toEqual(['error in field foo']);
+        expect(cc.errors.bar).toEqual(['error in field bar']);
+      });
     });
 
   });
