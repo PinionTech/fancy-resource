@@ -116,3 +116,17 @@ Run the tests:
 
     scripts/test.sh
 
+# Project info
+
+FancyResource was implemented (using ngResource as a base) by James Sadler
+(jim@pinion.gg) at Pinion (www.pinion.gg).
+
+It's just an experiment and may inspire the creation of an alternative resource
+API for Angular.js.
+
+Copyright © 2010-2012 Google, Inc. http://angularjs.org
+
+Copyright © 2012 Pinion Tech Pty Ltd.
+
+Released under the same license as angular.js - the MIT License.
+
