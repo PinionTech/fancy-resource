@@ -372,7 +372,7 @@ describe("fancyResource", function() {
     describe('copying the errors from the response', function() {
 
       it('should happen for 200', function() {
-        $httpBackend.expect('POST', '/CreditCard!validate').respond(200, '\n{\n"errors":\n{\n"foo":\n[\n"error in field foo"\n]\n}\n}\n');
+        $httpBackend.expect('POST', '/CreditCard!validate').respond(200, '{"errors":{"foo":["error in field foo"]}}');
         var cc = new CreditCard();
         cc.$validate();
         $httpBackend.flush();
@@ -380,7 +380,7 @@ describe("fancyResource", function() {
       });
 
       it('should happen for 201', function() {
-        $httpBackend.expect('POST', '/CreditCard!validate').respond(201, '\n{\n"errors":\n{\n"foo":\n[\n"error in field foo"\n]\n}\n}\n');
+        $httpBackend.expect('POST', '/CreditCard!validate').respond(201, '{"errors":{"foo":["error in field foo"]}}');
         var cc = new CreditCard();
         cc.$validate();
         $httpBackend.flush();
@@ -388,13 +388,34 @@ describe("fancyResource", function() {
       });
 
       it('should *only* copy the errors property', function() {
-        $httpBackend.expect('POST', '/CreditCard!validate').respond(201, '\n{\n"foo":\n"bar",\n"errors":\n{\n"foo":\n[\n"error in field foo"\n]\n}\n}\n');
+        $httpBackend.expect('POST', '/CreditCard!validate').respond(201, '{"foo":"bar","errors":{"foo":["error in field foo"]}}');
         var cc = new CreditCard();
         cc.$validate();
         $httpBackend.flush();
         expect(cc.foo).toBeUndefined();
       });
 
+    });
+
+    describe('property-at-a-time validations', function(){
+
+      it('should only copy the error from the requested property', function(){
+        $httpBackend.expect('POST', '/CreditCard!validate').respond(200, '{"errors":{"foo":["error in field foo"],"bar":["error in field bar"]}}');
+        var cc = new CreditCard();
+        cc.validateProperty('foo');
+        $httpBackend.flush();
+        expect(cc.errors.foo.length).toEqual(1);
+        expect(cc.errors.foo).toEqual(["error in field foo"]);
+      });
+
+      it('should remove errors from other properties', function() {
+        $httpBackend.expect('POST', '/CreditCard!validate').respond(200, '{"errors":{"foo":["error in field foo"]}}');
+        var cc = new CreditCard();
+        cc.errors = {bar: ['error in field bar']};
+        cc.validateProperty('foo');
+        $httpBackend.flush();
+        expect(cc.errors.bar).toBeUndefined();
+      });
     });
 
   });
