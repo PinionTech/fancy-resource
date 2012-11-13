@@ -5,6 +5,8 @@ files = [
   JASMINE,
   JASMINE_ADAPTER,
 
+  'deps/underscore/underscore.js',
+
   'deps/angular.js/build/angular.js',
   'deps/angular.js/build/angular-loader.js',
   'deps/angular.js/build/angular-mocks.js',
