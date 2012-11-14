@@ -356,17 +356,32 @@ describe("fancyResource", function() {
 
   describe('server-side validations', function() {
     beforeEach(function() {
-      CreditCard = $fancyResource('/CreditCard/:id', {id:'@id.key'}, {}, true);
+      CreditCard = $fancyResource('/CreditCard/:id', {id:'@id'}, {}, true);
     });
 
     it('should provide a validation action on the resource', function() {
       expect(typeof CreditCard.validate).toBe('function');
     });
 
-    it('should execute server side validation', function() {
-      $httpBackend.expect('POST', '/CreditCard!validate').respond({});
-      var cc = new CreditCard();
-      cc.$validate();
+    it('should provide a validateProprerty method on the resource instance', function() {
+      expect(typeof new CreditCard().validateProperty).toBe('function');
+    });
+
+    describe('valdiation route', function() {
+      describe('without an :id parameter', function(){
+        it('should execute server side validation', function() {
+          $httpBackend.expect('POST', '/CreditCard!validate').respond({});
+          var cc = new CreditCard();
+          cc.$validate();
+        });
+      });
+      describe('with an :id parameter', function(){
+        it('should execute server side validation', function() {
+          $httpBackend.expect('POST', '/CreditCard/1!validate').respond({});
+          var cc = new CreditCard({id: 1});
+          cc.$validate();
+        });
+      });
     });
 
     describe('copying the errors from the response', function() {
