@@ -3,15 +3,15 @@ node_js:
   - 0.8
 
 before_install:
+  - git submodule update --init --recursive
   - npm install qq
   - npm install q-fs
   - (cd deps/angular.js && rake package)
 
 before_script:
-  - git submodule update --init --recursive
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
-  - npm install -g testacular@canary
+  - npm install -g testacular
 
 script:
   - testacular start ./config/testacular-unit.conf.js --single-run --browsers PhantomJS
