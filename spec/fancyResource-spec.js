@@ -1,5 +1,15 @@
 'use strict';
 
+if (typeof Function.prototype.bind === 'undefined') {
+  // Naive bind polyfill to work around missing 'bind' in PhantomJS.
+  Function.prototype.bind = function(context) {
+    var that = this;
+    return function() {
+      return that.apply(context, arguments);
+    };
+  };
+}
+
 describe("fancyResource", function() {
   var $fancyResource, CreditCard, callback, $httpBackend;
 

@@ -14,4 +14,4 @@ before_script:
   - npm install -g testacular@canary
 
 script:
-  - testacular start ./config/testacular-unit.conf.js --single-run --browsers Chrome
+  - testacular start ./config/testacular-unit.conf.js --single-run --browsers PhantomJS
