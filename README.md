@@ -41,7 +41,7 @@ Withouth the array the relationship would be a 'has-one' relationship.
 creates all of the usual routes that you would expect with `ngResource` and you
 also get the following
 
- - POST /Employees/:id!validate
+ - POST /Employees/:id/!validate
  - POST /Employees/!validate
 
 Ideally the server should return a `200 OK` instead of a `201 Object Created`.
