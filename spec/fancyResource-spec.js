@@ -380,14 +380,14 @@ describe("fancyResource", function() {
     describe('valdiation route', function() {
       describe('without an :id parameter', function(){
         it('should execute server side validation', function() {
-          $httpBackend.expect('POST', '/CreditCard!validate').respond({});
+          $httpBackend.expect('POST', '/CreditCard/!validate').respond({});
           var cc = new CreditCard();
           cc.$validate();
         });
       });
       describe('with an :id parameter', function(){
         it('should execute server side validation', function() {
-          $httpBackend.expect('POST', '/CreditCard/1!validate').respond({});
+          $httpBackend.expect('POST', '/CreditCard/1/!validate').respond({});
           var cc = new CreditCard({id: 1});
           cc.$validate();
         });
@@ -397,7 +397,7 @@ describe("fancyResource", function() {
     describe('copying the errors from the response', function() {
 
       it('should happen for 200', function() {
-        $httpBackend.expect('POST', '/CreditCard!validate').respond(200, '{"errors":{"foo":["error in field foo"]}}');
+        $httpBackend.expect('POST', '/CreditCard/!validate').respond(200, '{"errors":{"foo":["error in field foo"]}}');
         var cc = new CreditCard();
         cc.$validate();
         $httpBackend.flush();
@@ -405,7 +405,7 @@ describe("fancyResource", function() {
       });
 
       it('should happen for 201', function() {
-        $httpBackend.expect('POST', '/CreditCard!validate').respond(201, '{"errors":{"foo":["error in field foo"]}}');
+        $httpBackend.expect('POST', '/CreditCard/!validate').respond(201, '{"errors":{"foo":["error in field foo"]}}');
         var cc = new CreditCard();
         cc.$validate();
         $httpBackend.flush();
@@ -413,7 +413,7 @@ describe("fancyResource", function() {
       });
 
       it('should *only* copy the errors property', function() {
-        $httpBackend.expect('POST', '/CreditCard!validate').respond(201, '{"foo":"bar","errors":{"foo":["error in field foo"]}}');
+        $httpBackend.expect('POST', '/CreditCard/!validate').respond(201, '{"foo":"bar","errors":{"foo":["error in field foo"]}}');
         var cc = new CreditCard();
         cc.$validate();
         $httpBackend.flush();
@@ -425,7 +425,7 @@ describe("fancyResource", function() {
     describe('property-at-a-time validations', function(){
 
       it('should only copy the error from the requested property', function(){
-        $httpBackend.expect('POST', '/CreditCard!validate').respond(200, '{"errors":{"foo":["error in field foo"],"bar":["error in field bar"]}}');
+        $httpBackend.expect('POST', '/CreditCard/!validate').respond(200, '{"errors":{"foo":["error in field foo"],"bar":["error in field bar"]}}');
         var cc = new CreditCard();
         cc.validateProperty('foo');
         $httpBackend.flush();
@@ -434,7 +434,7 @@ describe("fancyResource", function() {
       });
 
       it('should remove errors from other properties', function() {
-        $httpBackend.expect('POST', '/CreditCard!validate').respond(200, '{"errors":{"foo":["error in field foo"]}}');
+        $httpBackend.expect('POST', '/CreditCard/!validate').respond(200, '{"errors":{"foo":["error in field foo"]}}');
         var cc = new CreditCard();
         cc.errors = {bar: ['error in field bar']};
         cc.validateProperty('foo');
@@ -444,7 +444,7 @@ describe("fancyResource", function() {
 
       it('should throttle http requests to the server', function() {
         // This spec will fail if there is > 1 call to the server
-        $httpBackend.expect('POST', '/CreditCard!validate').respond(200, '{"errors":{"foo":["error in field foo"],"bar":["error in field bar"]}}');
+        $httpBackend.expect('POST', '/CreditCard/!validate').respond(200, '{"errors":{"foo":["error in field foo"],"bar":["error in field bar"]}}');
         var cc = new CreditCard();
         cc.validateProperty('foo');
         cc.validateProperty('bar');
