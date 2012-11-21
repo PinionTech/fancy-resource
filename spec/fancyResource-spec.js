@@ -153,6 +153,22 @@ describe("fancyResource", function() {
     inst.$post();
   });
 
+  it('should not clobber paramDefaults', function() {
+
+    var R = $fancyResource('/Customer/:id/:otherActionParam',
+      {id: '@id'}, {otherAction: {method: 'POST', params: {otherActionParam: 'other-action-says-hi'}}});
+
+    var thing = new R({id:123});
+
+    $httpBackend.expect('POST', '/Customer/123/other-action-says-hi').respond();
+    thing.$otherAction();
+    $httpBackend.flush();
+
+    $httpBackend.expect('POST', '/Customer/123').respond(); // This Fails because EVIL
+    thing.$save();
+    $httpBackend.flush();
+  });
+
 
   it('should handle multiple params with same name', function() {
     var R = $fancyResource('/:id/:id');
